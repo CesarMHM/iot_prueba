@@ -1,14 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+  <meta charset="UTF-8">
   <title>Dashboard IoT</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
 
-<h1>Mi primer dashboard IoT 🚀</h1>
+<h2>Dashboard IoT: Temperatura y Humedad</h2>
 
-<p>Si ves esto, GitHub Pages ya funciona</p>
+<p><b>Temperatura actual:</b> <span id="temp">--</span> °C</p>
+<p><b>Humedad actual:</b> <span id="hum">--</span> %</p>
+
+<canvas id="grafica" width="600" height="300"></canvas>
+
+<script>
+const CHANNEL_ID = "TU_CHANNEL_ID";
+const URL = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=10`;
+
+const ctx = document.getElementById("grafica").getContext("2d");
+
+const grafica = new Chart(ctx, {
+  type: "line",
+  data: {
+    labels: [],
+    datasets: [
+      {
+        label: "Temperatura °C",
+        data: []
+      },
+      {
+        label: "Humedad %",
+        data: []
+      }
+    ]
+  }
+});
+
+async function cargarDatos() {
+  const respuesta = await fetch(URL);
+  const datos = await respuesta.json();
+
+  const feeds = datos.feeds;
+
+  const etiquetas = feeds.map(item => new Date(item.created_at).toLocaleTimeString());
+  const temperaturas = feeds.map(item => Number(item.field1));
+  const humedades = feeds.map(item => Number(item.field2));
+
+  document.getElementById("temp").textContent = temperaturas[temperaturas.length - 1];
+  document.getElementById("hum").textContent = humedades[humedades.length - 1];
+
+  grafica.data.labels = etiquetas;
+  grafica.data.datasets[0].data = temperaturas;
+  grafica.data.datasets[1].data = humedades;
+  grafica.update();
+}
+
+cargarDatos();
+setInterval(cargarDatos, 20000);
+</script>
 
 </body>
 </html>
