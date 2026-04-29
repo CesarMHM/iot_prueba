@@ -18,7 +18,7 @@
 const CHANNEL_ID = "TU_CHANNEL_ID";
 const URL = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=10`;
 
-const ctx = document.getElementById("grafica").getContext("2d");
+const ctx = document.getElementById("graficas").getContext("2d");
 
 const grafica = new Chart(ctx, {
   type: "line",
